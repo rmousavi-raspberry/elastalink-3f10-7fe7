@@ -1,7 +1,7 @@
-Scaling [--solutionname--] With Kubernetes
+Scaling [elastalink-3f10-7fe7] With Kubernetes
 ===========================
 
-Generated On: --datetime-- UTC
+Generated On: 2025-02-21 17:00:02 UTC
 
 You can scale your solution with Kubernetes.  To do so, will will need to apply the following YAML files to your Kubernetes cluster.
 
@@ -35,13 +35,13 @@ You can scale your solution with Kubernetes.  To do so, will will need to apply 
    sudo systemctl restart docker
 
 
-Based on your TML solution [--solutionname--] - if you want to scale your application with Kubernetes - you will need to apply the following YAML files.
+Based on your TML solution [elastalink-3f10-7fe7] - if you want to scale your application with Kubernetes - you will need to apply the following YAML files.
 
 .. list-table::
 
    * - **YML File**
      - **Description**
-   * - :ref:`--solutionnamefile--`
+   * - :ref:`elastalink-3f10-7fe7.yml`
      - This is your main solution YAML file.  
  
        It MUST be applied to your Kubernetes cluster.
@@ -75,10 +75,10 @@ Based on your TML solution [--solutionname--] - if you want to scale your applic
        This is OPTIONAL.  However, it must be 
  
        applied if using Step 9 DAG.
-   * - :ref:`nginx-ingress---nginxname--.yml`
+   * - :ref:`nginx-ingress-elastalink-3f10-7fe7.yml`
      - If you are scaling your TML solution you must
 
-       apply the nginx-ingress--nginxname--.yml; this yaml is 
+       apply the nginx-ingresselastalink-3f10-7fe7.yml; this yaml is 
 
        auto-generated for every TML solution.
 
@@ -94,13 +94,13 @@ kubectl Apply command
 
 .. code-block:: YAML
 
-   --kubectl--
+   kubectl apply -f kafka.yml -f secrets.yml -f mysql-storage.yml -f mysql-db-deployment.yml -f elastalink-3f10-7fe7.yml
 
---solutionnamefile--
+elastalink-3f10-7fe7.yml
 ------------------------
 
 .. important::
-   Copy and Paste this YAML file: --solutionnamefile-- - and save it locally.
+   Copy and Paste this YAML file: elastalink-3f10-7fe7.yml - and save it locally.
 
 .. attention::
 
@@ -118,8 +118,173 @@ kubectl Apply command
 
 .. code-block:: YAML
 
-   ################# --solutionnamefile--
-   --solutionnamecode--
+   ################# elastalink-3f10-7fe7.yml
+   
+     apiVersion: apps/v1
+     kind: Deployment
+     metadata:
+       name: elastalink-3f10-7fe7
+     spec:
+       selector:
+         matchLabels:
+           app: elastalink-3f10-7fe7
+       replicas: 3 # tells deployment to run 1 pods matching the template
+       template:
+         metadata:
+           labels:
+             app: elastalink-3f10-7fe7
+         spec:
+           containers:
+           - name: elastalink-3f10-7fe7
+             image: rmousavi/elastalink-3f10-7fe7-amd64:latest
+             volumeMounts:
+             - name: dockerpath
+               mountPath: /var/run/docker.sock
+             ports:
+             - containerPort: 5050
+             - containerPort: 4040
+             - containerPort: 6060
+             env:
+             - name: TSS
+               value: '0'
+             - name: SOLUTIONNAME
+               value: 'elastalink-3f10-7fe7'
+             - name: SOLUTIONDAG
+               value: 'solution_preprocessing_dag-elastalink-3f10'
+             - name: GITUSERNAME
+               value: 'rmousavi-raspberry'
+             - name: GITREPOURL
+               value: 'https://github.com/rmousavi-raspberry/raspberrypitss.git'
+             - name: SOLUTIONEXTERNALPORT
+               value: '5050'
+             - name: CHIP
+               value: 'amd64'
+             - name: SOLUTIONAIRFLOWPORT
+               value: '4040'
+             - name: SOLUTIONVIPERVIZPORT
+               value: '6060'
+             - name: DOCKERUSERNAME
+               value: 'rmousavi'
+             - name: CLIENTPORT
+               value: '0'
+             - name: EXTERNALPORT
+               value: '43259'
+             - name: KAFKACLOUDUSERNAME
+               value: ''
+             - name: VIPERVIZPORT
+               value: '9005'
+             - name: MQTTUSERNAME
+               value: ''
+             - name: AIRFLOWPORT
+               value: '9000'
+             - name: GITPASSWORD
+               valueFrom:
+                 secretKeyRef:
+                  name: tmlsecrets 
+                  key: githubtoken                       
+             - name: KAFKACLOUDPASSWORD
+               valueFrom:
+                 secretKeyRef:
+                  name: tmlsecrets 
+                  key: kafkacloudpassword                      
+             - name: MQTTPASSWORD
+               valueFrom: 
+                 secretKeyRef:
+                   name: tmlsecrets 
+                   key: mqttpass                        
+             - name: READTHEDOCS
+               valueFrom:
+                 secretKeyRef:
+                   name: tmlsecrets 
+                   key: readthedocs          
+             - name: qip 
+               value: 'privategpt-service' # This is private GPT service in kubernetes
+             - name: KUBE
+               value: '1'
+             - name: step4maxrows # STEP 4 maxrows field can be adjusted here.  Higher the number more data to process, BUT more memory needed.
+               value: '800'
+             - name: step4bmaxrows # STEP 4b maxrows field can be adjusted here.  Higher the number more data to process, BUT more memory needed.
+               value: '-1'               
+             - name: step4cmaxrows # STEP 4c maxrows field can be adjusted here.  Higher the number more data to process, BUT more memory needed.
+               value: '-1'               
+             - name: step4crawdatatopic # STEP 4c
+               value: ''               
+             - name: step4csearchterms # STEP 4c 
+               value: ''               
+             - name: step4crememberpastwindows # STEP 4c 
+               value: ''               
+             - name: step4cpatternscorethreshold # STEP 4c 
+               value: ''               
+             - name: step4crtmsstream # STEP 4c 
+               value: ''                              
+             - name: step5rollbackoffsets # STEP 5 rollbackoffsets field can be adjusted here.  Higher the number more training data to process, BUT more memory needed.
+               value: '-1'                              
+             - name: step5processlogic # STEP 5 processlogic field can be adjusted here.  
+               value: ''                                                
+             - name: step5independentvariables # STEP 5 independent variables can be adjusted here.  
+               value: ''                                                                              
+             - name: step6maxrows # STEP 6 maxrows field can be adjusted here.  Higher the number more predictions to make, BUT more memory needed.
+               value: '-1'                              
+             - name: step9rollbackoffset # STEP 9 rollbackoffset field can be adjusted here.  Higher the number more information sent to privateGPT, BUT more memory needed.
+               value: '-1'                  
+             - name: step9prompt # STEP 9 Enter PGPT prompt
+               value: ''                  
+             - name: step9context # STEP 9 Enter PGPT context
+               value: ''                                 
+             - name: step9keyattribute
+               value: '' # Step 9 key attribtes change as needed  
+             - name: step9keyprocesstype
+               value: '' # Step 9 key processtypes change as needed                                               
+             - name: step9hyperbatch
+               value: '' # Set to 1 if you want to batch all of the hyperpredictions and sent to chatgpt, set to 0, if you want to send it one by one   
+             - name: step9vectordbcollectionname
+               value: ''   # collection name in Qdrant
+             - name: step9concurrency # privateGPT concurency, if greater than 1, multiple PGPT will run
+               value: ''
+             - name: CUDA_VISIBLE_DEVICES
+               value: '' # 0 for any device or specify specific number                
+             - name: step9docfolder # privateGPT docfolder to load files in Qdrant vectorDB local context
+               value: ''
+             - name: step9docfolderingestinterval # privateGPT docfolderingestinterval, number of seconds to wait before reloading files in docfolder
+               value: ''
+             - name: step9useidentifierinprompt # privateGPT useidentifierinprompt, if 1, add TML output json field Identifier, if 0 use prompt
+               value: ''                              
+             - name: step9searchterms # privateGPT searchterms, terms to search for in the chat response
+               value: ''                                             
+             - name: step9streamall # privateGPT streamall, if 1, stream all responses, even if search terms are missing, 0, if response contains search terms
+               value: ''                                                            
+             - name: step9temperature # privateGPT LLM temperature between 0 and 1 i.e. 0.3, if 0, LLM model is conservative, if 1 it hallucinates
+               value: ''                                             
+             - name: step9vectorsearchtype # privateGPT for QDrant VectorDB similarity search.  Must be either Cosine, Manhattan, Dot, Euclid
+               value: ''                                                                           
+             - name: step1solutiontitle # STEP 1 solutiontitle field can be adjusted here. 
+               value: 'ElastaLink TML Solution'                              
+             - name: step1description # STEP 1 description field can be adjusted here. 
+               value: 'This is an awesome real-time solution built by TSS for ElastaLink'                                          
+             - name: KUBEBROKERHOST
+               value: 'kafka-service:9092'         
+             - name: KAFKABROKERHOST
+               value: '127.0.0.1:9092'                              
+           volumes: 
+           - name: dockerpath
+             hostPath:
+               path: /var/run/docker.sock
+   ---
+     apiVersion: v1
+     kind: Service
+     metadata:
+       name: elastalink-3f10-7fe7-visualization-service
+       labels:
+         app: elastalink-3f10-7fe7-visualization-service
+     spec:
+       type: ClusterIP
+       ports:
+       - port: 80 # Ingress port, if using port 443 will need to setup TLS certs
+         name: p1
+         protocol: TCP
+         targetPort: 6060
+       selector:
+         app: elastalink-3f10-7fe7
 
 .. tip::
 
@@ -448,13 +613,13 @@ To visualize the dashboard you need to forward ports to your solution **deployme
 
 .. code-block::
 
-   --kube-portforward--
+   kubectl port-forward deployment/elastalink-3f10-7fe7 6060:6060
 
 After you forward the ports then copy/paste the viusalization URL below and run your dashboard.
 
 .. code-block::
 
-   --visualizationurl--
+   http://localhost:6060/iot-failure-elastalink.html?topic=iot-preprocess&offset=-1&groupid=&rollbackoffset=400&topictype=prediction&append=0&secure=1
 
 Scaling with NGINX Ingress and Ingress Controller
 -------------------------------------
@@ -505,18 +670,49 @@ All TML solutions will scale with NGINX ingress to perform load-balancing.  But,
 
       minikube tunnel
 
-   **STEP 4:  Apply nginx-ingress---nginxname--.yml to your kubernetes cluster.  First you need to save it locally then apply it:**
+   **STEP 4:  Apply nginx-ingress-elastalink-3f10-7fe7.yml to your kubernetes cluster.  First you need to save it locally then apply it:**
 
-nginx-ingress---nginxname--.yml
+nginx-ingress-elastalink-3f10-7fe7.yml
 -------------
 
    .. code-block::
 
-      --ingress--
+      
+    ############# nginx-ingress-elastalink-3f10-7fe7.yml
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: tml-ingress
+      annotations:
+        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+    spec:
+      ingressClassName: nginx
+      rules:
+        - host: tml.tss
+          http:
+            paths:
+              - path: /viz(/|$)(.*)
+                pathType: ImplementationSpecific
+                backend:
+                  service:
+                    name: elastalink-3f10-7fe7-visualization-service
+                    port:
+                      number: 80
+    ---
+    apiVersion: v1
+    kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: ingress-nginx-controller
+      namespace: ingress-nginx
+    data:
+      allow-snippet-annotations: "true"
+  
 
    .. code-block::
 
-      kubectl apply -f nginx-ingress---nginxname--.yml
+      kubectl apply -f nginx-ingress-elastalink-3f10-7fe7.yml
 
 You are now ready to run the Dashboard using Ingress load balancing.
 
@@ -527,7 +723,7 @@ Copy and paste this URL below in your browser and start streaming.  Because you 
 
 .. code-block::
 
-   --visualizationurling--
+   http://tml.tss/viz/iot-failure-elastalink.html?topic=iot-preprocess&offset=-1&groupid=&rollbackoffset=400&topictype=prediction&append=0&secure=1
 
 Making Secure TLS Connection with gRPC
 -----------------------
